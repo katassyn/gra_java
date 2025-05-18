@@ -23,6 +23,18 @@ public class Miasto {
         this.budynki = new ArrayList<>();
     }
 
+    public Miasto(String nazwa, int pieniadze, int materialy, int zywnosc, int populacja,
+                  int zadowolenie, double mnoznikZdarzen, List<Budynek> budynki) {
+        this.nazwa = nazwa;
+        this.pieniadze = pieniadze;
+        this.materialy = materialy;
+        this.zywnosc = zywnosc;
+        this.populacja = populacja;
+        this.zadowolenie = zadowolenie;
+        this.mnoznikZdarzen = mnoznikZdarzen;
+        this.budynki = budynki;
+    }
+
     public String getNazwa() {
         return nazwa;
     }
