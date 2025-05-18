@@ -1,5 +1,6 @@
 package org.example;
 
+import java.io.IOException;
 import java.util.*;
 
 public class Gra {
@@ -8,7 +9,10 @@ public class Gra {
     private int dzien;
     private Random random;
     private int poziomTrudnosci;
+    private int rasa;
     private boolean koniecGry;
+
+    //                                             FUNKCYJNE/MENU
 
     public Gra() {
         scanner = new Scanner(System.in);
@@ -17,15 +21,68 @@ public class Gra {
         koniecGry = false;
     }
 
-    public void start() {
+    public void menuGlowne() {
         powitanie();
-        wybierzPoziomTrudnosci();
-        inicjalizujMiasto();
+        boolean wyjscie = false;
 
+        while (!wyjscie) {
+            pokazMenuGlowne();
+            int wybor = pobierzWybor(1, 4);
+            System.out.println();
+
+            switch (wybor) {
+                case 1:
+                    wyjscie = true;
+                    nowaGra();
+                    break;
+                case 2:
+                    wyjscie = true;
+                    wczytajGra();
+                    break;
+                case 3:
+                    pokazPomoc();
+                    break;
+                case 4:
+                    wyjscie = true;
+                    System.out.println("Do zobaczenia następnym razem!");
+                    break;
+            }
+        }
+    }
+
+    private void nowaGra() {
+        wybierzPoziomTrudnosci();
+        wybierzRase();
+        inicjalizujMiasto();
+        start();
+    }
+
+    private void wczytajGra() {
+        System.out.println("Wybierz slot zapisu:");
+        int wybor = pobierzWybor(1, 3);
+        System.out.println();
+
+        String nazwaPliku = "zapis" + wybor + ".txt";
+
+        try {
+            StanGry stan = StanGry.wczytajZPliku(nazwaPliku);
+            this.miasto = stan.odtworzMiasto();
+            this.dzien = stan.getDzien();
+            System.out.println("Wczytano grę z zapisu " + wybor + "!");
+            System.out.println();
+            start();
+        } catch (IOException e) {
+            System.out.println("Nie udało się wczytać zapisu: " + e.getMessage());
+            System.out.println();
+        }
+    }
+
+    private void start() {
         while (!koniecGry) {
             wyswietlStatystyki();
             pokazMenu();
             int wybor = pobierzWybor(1, 6);
+            System.out.println();
 
             switch (wybor) {
                 case 1:
@@ -44,22 +101,98 @@ public class Gra {
                     pokazPomoc();
                     break;
                 case 6:
-                    koniecGry = true;
-                    System.out.println("Dziękujemy za grę! Twoje miasto przetrwało " + dzien + " dni.");
+                    wyjscie();
                     break;
             }
         }
     }
 
+    private int pobierzWybor(int min, int max) {
+        int wybor = -1;
+        while (wybor < min || wybor > max) {
+            System.out.print("Wybierz opcję (" + min + "-" + max + "): ");
+            try {
+                wybor = Integer.parseInt(scanner.nextLine());
+                if (wybor < min || wybor > max) {
+                    System.out.println("Nieprawidłowy wybór. Spróbuj ponownie.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Proszę wprowadzić liczbę.");
+            }
+        }
+        return wybor;
+    }
+
+
     private void powitanie() {
         System.out.println("========================================");
-        System.out.println("  BUDOWNICZY MIASTA - GRA STRATEGICZNA  ");
+        System.out.println("  BUDOWNICZY OSADY - GRA STRATEGICZNA  ");
         System.out.println("========================================");
-        System.out.println("Twoim zadaniem jest zbudowanie i rozwijanie miasta.");
+        System.out.println("Twoim zadaniem jest zbudowanie i rozwijanie twojej osady.");
         System.out.println("Zarządzaj zasobami, buduj budynki i reaguj na losowe wydarzenia.");
-        System.out.println("Powodzenia w rozwijaniu swojego miasta!");
+        System.out.println("Powodzenia w rozwijaniu swojego małego królestwa!");
         System.out.println();
     }
+
+    private void pokazMenuGlowne() {
+        System.out.println("========== MENU ==========");
+        System.out.println("1. Nowa gra");
+        System.out.println("2. Wczytaj zapis");
+        System.out.println("3. Pomoc");
+        System.out.println("4. Wyjście");
+    }
+
+    private void pokazPomoc() {
+        System.out.println("========== POMOC ==========");
+        System.out.println("Fantasy City Builder to gra, w której zarządzasz własnym fantastycznym miastem.");
+        System.out.println("Twoim zadaniem jest:");
+        System.out.println("- Budowanie różnych budynków, które zapewniają zasoby i korzyści");
+        System.out.println("- Dbanie o zadowolenie mieszkańców");
+        System.out.println("- Reagowanie na losowe wydarzenia");
+        System.out.println("- Zarządzanie zasobami (pieniądze, materiały, żywność)");
+        System.out.println();
+        System.out.println("Porady:");
+        System.out.println("- Upewnij się, że masz wystarczająco żywności dla swoich mieszkańców");
+        System.out.println("- Buduj zrównoważone miasto z różnymi typami budynków");
+        System.out.println("- Utrzymuj wysoki poziom zadowolenia mieszkańców");
+        System.out.println("- Zbieraj zasoby regularnie");
+        System.out.println("=============================");
+        System.out.println();
+    }
+
+    private void wyjscie() {
+        System.out.println("Czy chcesz zapisać stan gry?");
+        System.out.println("1. Tak");
+        System.out.println("2. Nie");;
+
+        int wybor = pobierzWybor(1, 2);
+        System.out.println();
+
+        if(wybor == 1) {
+            System.out.println("Wybierz slot zapisu:");
+            System.out.println("||UWAGA|| -- Spowoduje to usunięcie poprzedniego zapisu w tym slocie! -- ||UWAGA||");
+            int nrZapisu = pobierzWybor(1, 3);
+            String nazwaZapisu = "zapis" + nrZapisu + ".txt";
+            System.out.println();
+
+            try {
+                StanGry stan = new StanGry(miasto,dzien);
+                stan.zapiszDoPliku(nazwaZapisu);
+                koniecGry = true;
+                System.out.println("Dziękujemy za grę! Stan gry został zapisany.");
+                System.out.println();
+            } catch (IOException e) {
+                System.out.println("Błąd podczas zapisu gry: " + e.getMessage());
+            }
+
+        }else {
+            koniecGry = true;
+            System.out.println("Dziękujemy za grę! Twoja osada przetrwała " + dzien + " dni.");
+            System.out.println();
+        }
+    }
+
+    //                                             GRA
 
     private void wybierzPoziomTrudnosci() {
         System.out.println("Wybierz poziom trudności:");
@@ -68,6 +201,17 @@ public class Gra {
         System.out.println("3. Trudny - mniej zasobów, częstsze katastrofy, wyższe koszty");
 
         poziomTrudnosci = pobierzWybor(1, 3);
+        System.out.println();
+    }
+
+    private void wybierzRase() {
+        System.out.println("Wybierz rasę:");
+        System.out.println("1. Ludzie - # ");
+        System.out.println("2. Elfy - #");
+        System.out.println("3. Orki - #");
+        System.out.println("4. Nieumarli - #");
+
+        rasa = pobierzWybor(1, 4);
         System.out.println();
     }
 
@@ -132,23 +276,7 @@ public class Gra {
         System.out.println("3. Zbierz zasoby");
         System.out.println("4. Następny dzień");
         System.out.println("5. Pomoc");
-        System.out.println("6. Zakończ grę");
-    }
-
-    private int pobierzWybor(int min, int max) {
-        int wybor = -1;
-        while (wybor < min || wybor > max) {
-            System.out.print("Wybierz opcję (" + min + "-" + max + "): ");
-            try {
-                wybor = Integer.parseInt(scanner.nextLine());
-                if (wybor < min || wybor > max) {
-                    System.out.println("Nieprawidłowy wybór. Spróbuj ponownie.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Proszę wprowadzić liczbę.");
-            }
-        }
-        return wybor;
+        System.out.println("6. Wyjście");
     }
 
     private void budujBudynek() {
@@ -316,24 +444,6 @@ public class Gra {
                 miasto.zmniejszZadowolenie(random.nextInt(10) + 2);
                 break;
         }
-        System.out.println();
-    }
-
-    private void pokazPomoc() {
-        System.out.println("========== POMOC ==========");
-        System.out.println("City Builder to gra, w której zarządzasz własnym miastem.");
-        System.out.println("Twoim zadaniem jest:");
-        System.out.println("- Budowanie różnych budynków, które zapewniają zasoby i korzyści");
-        System.out.println("- Dbanie o zadowolenie mieszkańców");
-        System.out.println("- Reagowanie na losowe wydarzenia");
-        System.out.println("- Zarządzanie zasobami (pieniądze, materiały, żywność)");
-        System.out.println();
-        System.out.println("Porady:");
-        System.out.println("- Upewnij się, że masz wystarczająco żywności dla swoich mieszkańców");
-        System.out.println("- Buduj zrównoważone miasto z różnymi typami budynków");
-        System.out.println("- Utrzymuj wysoki poziom zadowolenia mieszkańców");
-        System.out.println("- Zbieraj zasoby regularnie");
-        System.out.println("=============================");
         System.out.println();
     }
 }
