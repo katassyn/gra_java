@@ -21,6 +21,8 @@ public class Miasto {
         this.zadowolenie = 50;
         this.mnoznikZdarzen = mnoznikZdarzen;
         this.budynki = new ArrayList<>();
+        Budynek nowyBudynek = new Budynek(TypBudynku.RATUSZ);
+        budynki.add(nowyBudynek);
     }
 
     public Miasto(String nazwa, int pieniadze, int materialy, int zywnosc, int populacja,

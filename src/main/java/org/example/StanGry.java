@@ -13,8 +13,10 @@ public class StanGry {
     private double mnoznikZdarzen;
     private List<Budynek> budynki;
     private int dzien;
+    private int rasa;
 
-    public StanGry(Miasto miasto, int dzien) {
+
+    public StanGry(Miasto miasto, int dzien,int rasa) {
         this.nazwa = miasto.getNazwa();
         this.pieniadze = miasto.getPieniadze();
         this.materialy = miasto.getMaterialy();
@@ -24,10 +26,11 @@ public class StanGry {
         this.mnoznikZdarzen = miasto.getMnoznikZdarzen();
         this.budynki = new ArrayList<>(miasto.getBudynki());
         this.dzien = dzien;
+        this.rasa = rasa;
     }
 
     public StanGry(String nazwa, int pieniadze, int materialy, int zywnosc, int populacja,
-                   int zadowolenie, double mnoznikZdarzen, int dzien, List<Budynek> budynki) {
+                   int zadowolenie, double mnoznikZdarzen, int dzien, int rasa,List<Budynek> budynki) {
         this.nazwa = nazwa;
         this.pieniadze = pieniadze;
         this.materialy = materialy;
@@ -36,11 +39,16 @@ public class StanGry {
         this.zadowolenie = zadowolenie;
         this.mnoznikZdarzen = mnoznikZdarzen;
         this.dzien = dzien;
+        this.rasa =rasa;
         this.budynki = budynki;
     }
 
     public int getDzien() {
         return dzien;
+    }
+
+    public int getRasa() {
+        return rasa;
     }
 
     public void zapiszDoPliku(String nazwaZapisu) throws IOException {
@@ -53,6 +61,7 @@ public class StanGry {
             plik.println(zadowolenie);
             plik.println(mnoznikZdarzen);
             plik.println(dzien);
+            plik.println(rasa);
             plik.println(budynki.size());
             for (Budynek b : budynki) {
                 plik.println(b.getTyp().name());
@@ -71,7 +80,7 @@ public class StanGry {
             int zadowolenie = Integer.parseInt(reader.readLine());
             double mnoznikZdarzen = Double.parseDouble(reader.readLine());
             int dzien = Integer.parseInt(reader.readLine());
-
+            int rasa = Integer.parseInt(reader.readLine());
             int liczbaBudynkow = Integer.parseInt(reader.readLine());
             List<Budynek> budynki = new ArrayList<>();
             for (int i = 0; i < liczbaBudynkow; i++) {
@@ -85,7 +94,7 @@ public class StanGry {
             }
 
             StanGry stan = new StanGry(nazwa, pieniadze, materialy, zywnosc, populacja,
-                    zadowolenie, mnoznikZdarzen, dzien, budynki);
+                    zadowolenie, mnoznikZdarzen, dzien, rasa, budynki);
             return stan;
         }
     }
