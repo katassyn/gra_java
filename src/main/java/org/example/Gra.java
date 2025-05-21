@@ -68,6 +68,7 @@ public class Gra {
             StanGry stan = StanGry.wczytajZPliku(nazwaPliku);
             this.miasto = stan.odtworzMiasto();
             this.dzien = stan.getDzien();
+            this.rasa = stan.getRasa();
             System.out.println("Wczytano grę z zapisu " + wybor + "!");
             System.out.println();
             start();
@@ -92,13 +93,14 @@ public class Gra {
                     ulepszBudynek();
                     break;
                 case 3:
-                    zbierzZasoby();
+                    istniejaceBudynki();
                     break;
                 case 4:
+                    zbierzZasoby();
                     nastepnyDzien();
                     break;
                 case 5:
-                    pokazPomoc();
+                    pokazPomocBudynki();
                     break;
                 case 6:
                     wyjscie();
@@ -129,7 +131,7 @@ public class Gra {
         System.out.println("  BUDOWNICZY OSADY - GRA STRATEGICZNA  ");
         System.out.println("========================================");
         System.out.println("Twoim zadaniem jest zbudowanie i rozwijanie twojej osady.");
-        System.out.println("Zarządzaj zasobami, buduj budynki i reaguj na losowe wydarzenia.");
+        System.out.println("Zarządzaj zasobami, buduj budynki i reaguj na losowe wydarzenia jedną z 4 unikalnych ras.");
         System.out.println("Powodzenia w rozwijaniu swojego małego królestwa!");
         System.out.println();
     }
@@ -160,6 +162,33 @@ public class Gra {
         System.out.println();
     }
 
+    private void pokazPomocBudynki() {
+        System.out.println("========== POMOC - BUDYNKI ==========");
+        System.out.println("Lista budynków wraz z ich zastosowaniem:");
+
+        switch (rasa) {
+            case 1:
+                System.out.println("Ratusz - podstawowy budynek każdego miasta, jego poziom ogranicza liczbę i poziom budynków które możesz wybudować");
+                System.out.println("Liczba bydynków 2 x poziom ratusza, maksymalny poziom budynku = poziom ratusza ");
+                System.out.println("");
+                System.out.println("Dom - budynek zwiększający liczbę miesdzkańców osady");
+                System.out.println("Dodatkowo generuje - złota i + zadowolenia dziennie");
+                System.out.println("");
+                System.out.println("Pole uprawne - pozwala na uprawę jedzenia");
+                System.out.println("Dodatkowo generuje - złota i + zadowolenia dziennie");
+                System.out.println("");
+                System.out.println("Kopalnia kamienia - pozwala na wydobycie kamienia");
+                System.out.println("Dodatkowo generuje - złota  i  zadowolenia dziennie");
+                System.out.println("");
+                System.out.println("Kopalnia złota - pozwala na wydobycie złota");
+                System.out.println("Dodatkowo generuje + zadowolenia dziennie");
+                System.out.println("");
+                System.out.println("Światynia - zwieksza zadowolenie mieszkańców");
+                System.out.println("Dodatkowo generuje + złota dziennie");
+                System.out.println("");
+        }
+    }
+
     private void wyjscie() {
         System.out.println("Czy chcesz zapisać stan gry?");
         System.out.println("1. Tak");
@@ -176,7 +205,7 @@ public class Gra {
             System.out.println();
 
             try {
-                StanGry stan = new StanGry(miasto,dzien);
+                StanGry stan = new StanGry(miasto,dzien,rasa);
                 stan.zapiszDoPliku(nazwaZapisu);
                 koniecGry = true;
                 System.out.println("Dziękujemy za grę! Stan gry został zapisany.");
@@ -213,6 +242,16 @@ public class Gra {
 
         rasa = pobierzWybor(1, 4);
         System.out.println();
+    }
+
+    private String nazwaRasy(int rasa) {
+        switch (rasa) {
+            case 1: return "Ludzie";
+            case 2: return "Elfy";
+            case 3: return "Orki";
+            case 4: return "Nieumarli";
+            default: return "Nieznana";
+        }
     }
 
     private void inicjalizujMiasto() {
@@ -256,12 +295,12 @@ public class Gra {
 
     private void wyswietlStatystyki() {
         System.out.println("========================================");
-        System.out.println("Dzień: " + dzien + " | Miasto: " + miasto.getNazwa());
+        System.out.println("Dzień: " + dzien + " | Miasto: " + miasto.getNazwa() + " | Rasa: " + nazwaRasy(rasa));
         System.out.println("========================================");
         System.out.println("Populacja: " + miasto.getPopulacja() + " osób");
         System.out.println("Zadowolenie: " + miasto.getZadowolenie() + "%");
-        System.out.println("Pieniądze: " + miasto.getPieniadze() + " złotych");
-        System.out.println("Materiały budowlane: " + miasto.getMaterialy() + " jednostek");
+        System.out.println("Pieniądze: " + miasto.getPieniadze() + " złota");
+        System.out.println("Materiały budowlane: " + miasto.getMaterialy() + " kamienia");
         System.out.println("Żywność: " + miasto.getZywnosc() + " jednostek");
         System.out.println("========================================");
         System.out.println("Liczba budynków: " + miasto.getLiczbaBudynkow());
@@ -273,69 +312,86 @@ public class Gra {
         System.out.println("Co chcesz zrobić?");
         System.out.println("1. Buduj nowy budynek");
         System.out.println("2. Ulepsz istniejący budynek");
-        System.out.println("3. Zbierz zasoby");
+        System.out.println("3. Istniejące budynki");
         System.out.println("4. Następny dzień");
-        System.out.println("5. Pomoc");
+        System.out.println("5. Pomoc - lista budynków i ich zastosowania");
         System.out.println("6. Wyjście");
     }
 
+    public int getPoziomRatusza() {
+        Budynek ratusz = miasto.getBudynki().get(0);
+        return ratusz.getPoziom();
+    }
+
+
     private void budujBudynek() {
-        System.out.println("Jakie budynki możesz wybudować:");
-        System.out.println("1. Dom mieszkalny (100 złotych, 50 materiałów) - zwiększa populację o 10 osób");
-        System.out.println("2. Farma (150 złotych, 30 materiałów) - produkuje 15 jedzenia dziennie");
-        System.out.println("3. Kopalnia (200 złotych, 100 materiałów) - produkuje 20 materiałów dziennie");
-        System.out.println("4. Ratusz (300 złotych, 200 materiałów) - zwiększa zadowolenie o 5%");
-        System.out.println("5. Targ (250 złotych, 120 materiałów) - generuje 50 złotych dziennie");
-        System.out.println("6. Park (150 złotych, 80 materiałów) - zwiększa zadowolenie o 10%");
-        System.out.println("7. Powrót do menu głównego");
+        if(miasto.getLiczbaBudynkow() -1 >= getPoziomRatusza()*2) {
+            System.out.println("Nie możesz wybudować wiecej budynków, zwiększ poziom ratusza!");
+            System.out.println();
+        }else{
+            System.out.println("Jakie budynki możesz wybudować:");
+            System.out.println("1. Dom (100 złota, 50 kamienia) - zwiększa populację o 10 osób");
+            System.out.println("2. Pole uprawne (150 złota, 30 kamienia) - produkuje 15 jedzenia dziennie");
+            System.out.println("3. Kopalnia kamienia(200 złota, 100 kamienia) - produkuje 20 kamienia dziennie");
+            System.out.println("4. Kopalnia złota (250 złota, 120 kamienia) - generuje 50 złota dziennie");
+            System.out.println("5. Światynia (150 złota, 80 kamienia) - zwiększa zadowolenie o 10%");
+            System.out.println("6. Powrót do menu głównego");
 
-        int wybor = pobierzWybor(1, 7);
-        if (wybor == 7) return;
+            int wybor = pobierzWybor(1, 6);
+            if (wybor == 6) return;
 
-        TypBudynku typ;
-        switch (wybor) {
-            case 1: typ = TypBudynku.DOM; break;
-            case 2: typ = TypBudynku.FARMA; break;
-            case 3: typ = TypBudynku.KOPALNIA; break;
-            case 4: typ = TypBudynku.RATUSZ; break;
-            case 5: typ = TypBudynku.TARG; break;
-            case 6: typ = TypBudynku.PARK; break;
-            default: return;
+            TypBudynku typ;
+            switch (wybor) {
+                case 1: typ = TypBudynku.DOM; break;
+                case 2: typ = TypBudynku.POLE; break;
+                case 3: typ = TypBudynku.KOPALNIAK; break;
+                case 4: typ = TypBudynku.KOPALNIAZ; break;
+                case 5: typ = TypBudynku.SWIATYNIA; break;
+                default: return;
+            }
+
+            if (miasto.mozeBudowac(typ)) {
+                miasto.budujBudynek(typ);
+                System.out.println("Budynek " + typ.getNazwa() + " został wybudowany!");
+            } else {
+                System.out.println("Nie masz wystarczających zasobów, aby wybudować ten budynek.");
+            }
+            System.out.println();
+        }
+    }
+
+    private void istniejaceBudynki() {
+        List<Budynek> budynki = miasto.getBudynki();
+        System.out.println("Istniejące budynki:");
+        for (int i = 0; i < budynki.size(); i++) {
+            Budynek b = budynki.get(i);
+            System.out.println((i+1) + ". " + b.getTyp().getNazwa() + " (Poziom " + b.getPoziom() + ")");
         }
 
-        if (miasto.mozeBudowac(typ)) {
-            miasto.budujBudynek(typ);
-            System.out.println("Budynek " + typ.getNazwa() + " został wybudowany!");
-        } else {
-            System.out.println("Nie masz wystarczających zasobów, aby wybudować ten budynek.");
-        }
         System.out.println();
     }
 
     private void ulepszBudynek() {
         List<Budynek> budynki = miasto.getBudynki();
-        if (budynki.isEmpty()) {
-            System.out.println("Nie masz jeszcze żadnych budynków do ulepszenia.");
-            System.out.println();
-            return;
-        }
-
         System.out.println("Które budynki chcesz ulepszyć:");
         for (int i = 0; i < budynki.size(); i++) {
             Budynek b = budynki.get(i);
             System.out.println((i+1) + ". " + b.getTyp().getNazwa() + " (Poziom " + b.getPoziom() + ") - Koszt ulepszenia: " +
-                    b.getKosztUlepszeniaPieniadze() + " złotych, " + b.getKosztUlepszeniaMaterialy() + " materiałów");
+                    b.getKosztUlepszeniaPieniadze() + " złota, " + b.getKosztUlepszeniaMaterialy() + " kamienia");
         }
         System.out.println((budynki.size()+1) + ". Powrót do menu głównego");
 
         int wybor = pobierzWybor(1, budynki.size()+1);
         if (wybor == budynki.size()+1) return;
+        System.out.println("");
 
         Budynek wybranyBudynek = budynki.get(wybor-1);
-        if (miasto.mozeUlepszyc(wybranyBudynek)) {
+        if (wybranyBudynek.getPoziom() >= getPoziomRatusza() && wybranyBudynek.getTyp() != TypBudynku.RATUSZ) {
+            System.out.println("Budowla może mieć maksymalnie poziom ratusza, zwiększ poziom ratusza!");
+        }else if (miasto.mozeUlepszyc(wybranyBudynek)) {
             miasto.ulepszBudynek(wybranyBudynek);
             System.out.println("Budynek " + wybranyBudynek.getTyp().getNazwa() + " został ulepszony do poziomu " + wybranyBudynek.getPoziom() + "!");
-        } else {
+        }else {
             System.out.println("Nie masz wystarczających zasobów, aby ulepszyć ten budynek.");
         }
         System.out.println();
@@ -347,15 +403,14 @@ public class Gra {
         int zebranaZywnosc = miasto.zbierzZywnosc();
 
         System.out.println("Zebrano następujące zasoby:");
-        System.out.println("- " + zebraneZloto + " złotych");
-        System.out.println("- " + zebraneMaterialy + " materiałów");
-        System.out.println("- " + zebranaZywnosc + " jednostek żywności");
+        System.out.println("- " + zebraneZloto + " złota");
+        System.out.println("- " + zebraneMaterialy + " kamienia");
+        System.out.println("- " + zebranaZywnosc + " jedzenia");
         System.out.println();
     }
 
     private void nastepnyDzien() {
         dzien++;
-        miasto.aktualizujZasoby();
 
         // Sprawdzanie warunków przetrwania
         if (miasto.getZywnosc() <= 0) {
@@ -378,7 +433,7 @@ public class Gra {
         // Zużycie żywności
         int zuzycie = miasto.getPopulacja() / 10;
         miasto.zmniejszZywnosc(zuzycie);
-        System.out.println("Twoi mieszkańcy zużyli " + zuzycie + " jednostek żywności.");
+        System.out.println("Twoi mieszkańcy zużyli " + zuzycie + " jedzenia.");
 
         System.out.println("Nastał nowy dzień!");
         System.out.println();
@@ -424,12 +479,12 @@ public class Gra {
                 miasto.zmniejszPieniadze(random.nextInt(50) + 25);
                 break;
             case 6:
-                System.out.println("Udany zbiór! Twoje farmy wyprodukwały więcej żywności niż zwykle.");
+                System.out.println("Udany zbiór! Twoje pola uprawne wyprodukwały więcej żywności niż zwykle.");
                 miasto.zwiekszZywnosc(random.nextInt(50) + 25);
                 miasto.zwiekszZadowolenie(random.nextInt(3) + 1);
                 break;
             case 7:
-                System.out.println("Nieurodzaj! Twoje farmy wyprodukwały mniej żywności niż zwykle.");
+                System.out.println("Nieurodzaj! Twoje pola uprawne wyprodukwały mniej żywności niż zwykle.");
                 miasto.zmniejszZywnosc(random.nextInt(40) + 20);
                 miasto.zmniejszZadowolenie(random.nextInt(5) + 2);
                 break;

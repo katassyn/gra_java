@@ -1,12 +1,14 @@
 package org.example;
 
 public enum TypBudynku {
-    DOM("Dom mieszkalny", 100, 50, 10, 0, 0, 0, 5),
-    FARMA("Farma", 150, 30, 0, 0, 15, 0, 3),
-    KOPALNIA("Kopalnia", 200, 100, 0, 20, 0, 0, -2),
-    RATUSZ("Ratusz", 300, 200, 0, 0, 0, 5, 0),
-    TARG("Targ", 250, 120, 0, 0, 0, 2, 50),
-    PARK("Park", 150, 80, 0, 0, 0, 10, 0);
+    RATUSZ("Ratusz", 300, 300, 0, 0, 0, 0, 0),
+
+    //Ludzie
+    DOM("Dom", 100, 50, 10, 0, 0, 5, -1),
+    POLE("Pole uprawne", 150, 30, 0, 0, 15, 3, -1),
+    KOPALNIAK("Kopalnia kamienia", 200, 100, 0, 20, 0, 1, -2),
+    KOPALNIAZ("Kopalnia złota", 250, 120, 0, 0, 0, 2, 50),
+    SWIATYNIA("Świątynia", 150, 80, 0, 0, 0, 10, 0);
 
     private final String nazwa;
     private final int kosztPieniadze;
