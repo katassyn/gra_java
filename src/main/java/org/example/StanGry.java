@@ -7,6 +7,7 @@ public class StanGry {
     private String nazwa;
     private int pieniadze;
     private int materialy;
+    private int materialySpec;
     private int zywnosc;
     private int populacja;
     private int zadowolenie;
@@ -20,6 +21,7 @@ public class StanGry {
         this.nazwa = miasto.getNazwa();
         this.pieniadze = miasto.getPieniadze();
         this.materialy = miasto.getMaterialy();
+        this.materialySpec = miasto.getMaterialySpec();
         this.zywnosc = miasto.getZywnosc();
         this.populacja = miasto.getPopulacja();
         this.zadowolenie = miasto.getZadowolenie();
@@ -29,11 +31,12 @@ public class StanGry {
         this.rasa = rasa;
     }
 
-    public StanGry(String nazwa, int pieniadze, int materialy, int zywnosc, int populacja,
+    public StanGry(String nazwa, int pieniadze, int materialy,int materialySpec, int zywnosc, int populacja,
                    int zadowolenie, double mnoznikZdarzen, int dzien, int rasa,List<Budynek> budynki) {
         this.nazwa = nazwa;
         this.pieniadze = pieniadze;
         this.materialy = materialy;
+        this.materialySpec = materialySpec;
         this.zywnosc = zywnosc;
         this.populacja = populacja;
         this.zadowolenie = zadowolenie;
@@ -56,6 +59,7 @@ public class StanGry {
             plik.println(nazwa);
             plik.println(pieniadze);
             plik.println(materialy);
+            plik.println(materialySpec);
             plik.println(zywnosc);
             plik.println(populacja);
             plik.println(zadowolenie);
@@ -75,6 +79,7 @@ public class StanGry {
             String nazwa = reader.readLine();
             int pieniadze = Integer.parseInt(reader.readLine());
             int materialy = Integer.parseInt(reader.readLine());
+            int materialyspec = Integer.parseInt(reader.readLine());
             int zywnosc = Integer.parseInt(reader.readLine());
             int populacja = Integer.parseInt(reader.readLine());
             int zadowolenie = Integer.parseInt(reader.readLine());
@@ -93,14 +98,14 @@ public class StanGry {
                 budynki.add(budynek);
             }
 
-            StanGry stan = new StanGry(nazwa, pieniadze, materialy, zywnosc, populacja,
+            StanGry stan = new StanGry(nazwa, pieniadze, materialy,materialyspec, zywnosc, populacja,
                     zadowolenie, mnoznikZdarzen, dzien, rasa, budynki);
             return stan;
         }
     }
 
     public Miasto odtworzMiasto() {
-        return new Miasto(nazwa, pieniadze, materialy, zywnosc, populacja,
+        return new Miasto(nazwa, pieniadze, materialy,materialySpec, zywnosc, populacja,
                 zadowolenie, mnoznikZdarzen, budynki);
     }
 }

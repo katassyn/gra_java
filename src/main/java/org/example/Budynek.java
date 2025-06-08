@@ -29,12 +29,20 @@ public class Budynek {
         return (int)(typ.getKosztMaterialy() * 0.7 * poziom);
     }
 
+    public int getKosztUlepszeniaMaterialySpec() {
+        return (int)(typ.getKosztMaterialySpec() * 0.7 * poziom);
+    }
+
     public int getBonusPopulacja() {
         return (int)(typ.getBonusPopulacja() * getMnoznikPoziomu());
     }
 
     public int getBonusMaterialy() {
         return (int)(typ.getBonusMaterialy() * getMnoznikPoziomu());
+    }
+
+    public int getBonusMaterialySpec() {
+        return (int)(typ.getBonusMaterialySpec() * getMnoznikPoziomu());
     }
 
     public int getBonusZywnosc() {
@@ -49,7 +57,5 @@ public class Budynek {
         return (int)(typ.getBonusPieniadze() * getMnoznikPoziomu());
     }
 
-    private double getMnoznikPoziomu() {
-        return 1.0 + (poziom - 1) * 0.5;
-    }
+    private double getMnoznikPoziomu() { return 1.0 + (poziom - 1) * 0.5; }
 }

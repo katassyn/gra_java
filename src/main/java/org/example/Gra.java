@@ -9,8 +9,9 @@ public class Gra {
     private int dzien;
     private Random random;
     private int poziomTrudnosci;
-    private int rasa;
+    private Rasa rasa;
     private boolean koniecGry;
+    private boolean specjalny;
 
     //                                             FUNKCYJNE/MENU
 
@@ -19,6 +20,7 @@ public class Gra {
         random = new Random();
         dzien = 1;
         koniecGry = false;
+        specjalny = false;
     }
 
     public void menuGlowne() {
@@ -40,7 +42,7 @@ public class Gra {
                     wczytajGra();
                     break;
                 case 3:
-                    pokazPomoc();
+                    pokazPomocGlowne();
                     break;
                 case 4:
                     wyjscie = true;
@@ -68,7 +70,7 @@ public class Gra {
             StanGry stan = StanGry.wczytajZPliku(nazwaPliku);
             this.miasto = stan.odtworzMiasto();
             this.dzien = stan.getDzien();
-            this.rasa = stan.getRasa();
+            this.rasa = Rasa.fromBitmask(stan.getRasa());
             System.out.println("Wczytano grę z zapisu " + wybor + "!");
             System.out.println();
             start();
@@ -81,8 +83,7 @@ public class Gra {
     private void start() {
         while (!koniecGry) {
             wyswietlStatystyki();
-            pokazMenu();
-            int wybor = pobierzWybor(1, 6);
+            int wybor = pokazMenu();
             System.out.println();
 
             switch (wybor) {
@@ -95,16 +96,56 @@ public class Gra {
                 case 3:
                     istniejaceBudynki();
                     break;
-                case 4:
-                    zbierzZasoby();
-                    nastepnyDzien();
-                    break;
-                case 5:
-                    pokazPomocBudynki();
-                    break;
-                case 6:
-                    wyjscie();
-                    break;
+                default:
+                    if(rasa.getBitmask()==16) {
+                        switch (wybor) {
+                            case 4:
+                                wypuscHorde();
+                                break;
+                            case 5:
+                                zbierzZasoby();
+                                nastepnyDzien();
+                                break;
+                            case 6:
+                                pokazPomoc();
+                                break;
+                            case 7:
+                                wyjscie();
+                                break;
+                        }
+                    }else if(rasa.getBitmask()==32) {
+                        switch (wybor) {
+                            case 4:
+                                lowyKrwi();
+                                break;
+                            case 5:
+                                oczyscKrew();
+                                break;
+                            case 6:
+                                zbierzZasoby();
+                                nastepnyDzien();
+                                break;
+                            case 7:
+                                pokazPomoc();
+                                break;
+                            case 8:
+                                wyjscie();
+                                break;
+                        }
+                    } else {
+                        switch (wybor) {
+                            case 4:
+                                zbierzZasoby();
+                                nastepnyDzien();
+                                break;
+                            case 5:
+                                pokazPomoc();
+                                break;
+                            case 6:
+                                wyjscie();
+                                break;
+                        }
+                    }
             }
         }
     }
@@ -125,13 +166,12 @@ public class Gra {
         return wybor;
     }
 
-
     private void powitanie() {
         System.out.println("========================================");
         System.out.println("  BUDOWNICZY OSADY - GRA STRATEGICZNA  ");
         System.out.println("========================================");
         System.out.println("Twoim zadaniem jest zbudowanie i rozwijanie twojej osady.");
-        System.out.println("Zarządzaj zasobami, buduj budynki i reaguj na losowe wydarzenia jedną z 4 unikalnych ras.");
+        System.out.println("Zarządzaj zasobami, buduj budynki i reaguj na losowe wydarzenia jedną z 6 unikalnych ras.");
         System.out.println("Powodzenia w rozwijaniu swojego małego królestwa!");
         System.out.println();
     }
@@ -144,8 +184,58 @@ public class Gra {
         System.out.println("4. Wyjście");
     }
 
+    private void pokazPomocGlowne() {
+        boolean wyjscie = false;
+
+        while (!wyjscie) {
+            System.out.println("========== POMOC ==========");
+            System.out.println("1. POMOC - GRA");
+            System.out.println("2. POMOC - RASY");
+            System.out.println("3. Powrót do menu głównego");
+            int wybor = pobierzWybor(1, 3);
+            System.out.println();
+
+            switch (wybor) {
+                case 1:
+                    pokazPomocGra();
+                    break;
+                case 2:
+                    pokazPomocRasy();
+                    break;
+                case 3:
+                    wyjscie = true;
+                    break;
+            }
+        }
+    }
+
     private void pokazPomoc() {
-        System.out.println("========== POMOC ==========");
+        boolean wyjscie = false;
+
+        while (!wyjscie) {
+            System.out.println("========== POMOC ==========");
+            System.out.println("1. POMOC - GRA");
+            System.out.println("2. POMOC - BUDYNKI");
+            System.out.println("3. Powrót do menu głównego");
+            int wybor = pobierzWybor(1, 3);
+            System.out.println();
+
+            switch (wybor) {
+                case 1:
+                    pokazPomocGra();
+                    break;
+                case 2:
+                    pokazPomocBudynki();
+                    break;
+                case 3:
+                    wyjscie = true;
+                    break;
+            }
+        }
+    }
+
+    private void pokazPomocGra() {
+        System.out.println("========== POMOC - GRA ==========");
         System.out.println("Fantasy City Builder to gra, w której zarządzasz własnym fantastycznym miastem.");
         System.out.println("Twoim zadaniem jest:");
         System.out.println("- Budowanie różnych budynków, które zapewniają zasoby i korzyści");
@@ -164,30 +254,83 @@ public class Gra {
 
     private void pokazPomocBudynki() {
         System.out.println("========== POMOC - BUDYNKI ==========");
-        System.out.println("Lista budynków wraz z ich zastosowaniem:");
+        System.out.println("Pieniądze, materiały oraz żywność to zasoby generowane każdego dnia, zadowolenie oraz liczba mieszkańców zmienia się tylko po wybudowaniu/ulepszeniu budynku.");
+        System.out.println("Lista budynków dostępnych dla rasy: " + rasa.getNazwa());
+        System.out.println();
 
-        switch (rasa) {
-            case 1:
-                System.out.println("Ratusz - podstawowy budynek każdego miasta, jego poziom ogranicza liczbę i poziom budynków które możesz wybudować");
-                System.out.println("Liczba bydynków 2 x poziom ratusza, maksymalny poziom budynku = poziom ratusza ");
-                System.out.println("");
-                System.out.println("Dom - budynek zwiększający liczbę miesdzkańców osady");
-                System.out.println("Dodatkowo generuje - złota i + zadowolenia dziennie");
-                System.out.println("");
-                System.out.println("Pole uprawne - pozwala na uprawę jedzenia");
-                System.out.println("Dodatkowo generuje - złota i + zadowolenia dziennie");
-                System.out.println("");
-                System.out.println("Kopalnia kamienia - pozwala na wydobycie kamienia");
-                System.out.println("Dodatkowo generuje - złota  i  zadowolenia dziennie");
-                System.out.println("");
-                System.out.println("Kopalnia złota - pozwala na wydobycie złota");
-                System.out.println("Dodatkowo generuje + zadowolenia dziennie");
-                System.out.println("");
-                System.out.println("Światynia - zwieksza zadowolenie mieszkańców");
-                System.out.println("Dodatkowo generuje + złota dziennie");
-                System.out.println("");
+        for (TypBudynku typ : TypBudynku.values()) {
+            if (typ.jestRatuszem()) {continue;}
+
+            if ((typ.getBitmaskRasy() & rasa.getBitmask()) != 0) {
+                String info = typ.getNazwa() + " (" + typ.getTyp() + ")";
+
+                List<String> statystyki = new ArrayList<>();
+                if (typ.getKosztPieniadze() != 0) statystyki.add(typ.getKosztPieniadze() + " " + rasa.getPieniadze());
+                if (typ.getKosztMaterialy() != 0) statystyki.add(typ.getKosztMaterialy() + " " + rasa.getMaterialy());
+                if (typ.getKosztMaterialySpec() != 0) statystyki.add(typ.getKosztMaterialySpec() + " " + rasa.getMaterialySpec());
+
+                if (!statystyki.isEmpty()) {
+                    info += " - Koszt wybudowania: " + String.join(" / ", statystyki);
+                }
+
+                statystyki = new ArrayList<>();
+                if (typ.getBonusPieniadze() != 0) statystyki.add((typ.getBonusPieniadze() >= 0 ? "+" : "") +typ.getBonusPieniadze() + " " + rasa.getPieniadze());
+                if (typ.getBonusMaterialy() != 0) statystyki.add((typ.getBonusMaterialy() >= 0 ? "+" : "") +typ.getBonusMaterialy() + " " + rasa.getMaterialy());
+                if (typ.getBonusMaterialySpec() != 0) statystyki.add((typ.getBonusMaterialySpec() >= 0 ? "+" : "") +typ.getBonusMaterialySpec() + " " + rasa.getMaterialySpec());
+                if (typ.getBonusZywnosc() != 0) statystyki.add((typ.getBonusZywnosc() >= 0 ? "+" : "") +typ.getBonusZywnosc() + " " + rasa.getZywnosc());
+                if (typ.getBonusZadowolenie() != 0) statystyki.add("+"+typ.getBonusZadowolenie() + "% Zadowolenia");
+                if (typ.getBonusPopulacja() != 0) statystyki.add("+"+typ.getBonusPopulacja() + " Populacji");
+
+                if (!statystyki.isEmpty()) {
+                    info += "  -  Statystyki: " + String.join(" / ", statystyki);
+                }
+
+                if(typ.getNazwa().equalsIgnoreCase("Horda")) {
+                    info += " - pozwala wysłać nieumarłych na plądrowanie, Zapewnia: (0-2)*populacja %zadowolenia";
+                }
+                if(typ.getNazwa().equalsIgnoreCase("Oczyszczalnia Krwi")) {
+                    info += " - pozwala oczyścić zanieczyszczoną krew, Koszt: 10 Zanieczyszczonej Krwi / Szansa: 70% na 5 Fiolek Czystej Krwi";
+                }
+                if(typ.getNazwa().equalsIgnoreCase("Koszary Wojowników Krwi")) {
+                    info += " - pozwala wysłać wojowników na łowy, Zapewnia: (0-1)*populacja Fiolek Czystej Krwi / (0-4)*populacja Zanieczyszczonej Krwi / (0-9) Nowych Wampirów";
+                }
+
+
+                System.out.println(info);
+                System.out.println();
+            }
         }
     }
+
+    private void pokazPomocRasy() {
+        System.out.println("========== POMOC - RASY ==========");
+        System.out.println("W Fantasy City Builder możesz zagrać jedną z 6 unikalnych ras");
+        System.out.println("Rasy róznią się stylem gry, zasobami oraz budynkami");
+        System.out.println("Dostępne rasy: ");
+        System.out.println();
+        System.out.println("- Ludzie");
+        System.out.println("Wszechstronna rasa o zbalansowanych surowcach i możliwościach rozwoju");
+        System.out.println();
+        System.out.println("- Elfy");
+        System.out.println("Magiczne istoty żyjące w harmonii z naturą, wykorzystujące magię i jagody");
+        System.out.println();
+        System.out.println("- Krasnoludy");
+        System.out.println("Mistrzowie kopalń i rzemiosła, gromadzący diamenty i żelazo");
+        System.out.println();
+        System.out.println("- Orki");
+        System.out.println("Dzicy wojownicy polegający na sile, nieznający pojecią pieniądza");
+        System.out.println();
+        System.out.println("- Nieumarli");
+        System.out.println("Mroczne wybryki natury, nie potrzebują pieniędzy ani jedzenia,");
+        System.out.println("czerpią przyjemność z plądrowania hordą pobliskich osad");
+        System.out.println();
+        System.out.println("- Wampiry");
+        System.out.println("Arystokratyczne potwory ukrywające się w cieniu, ich głównym surowcem jest krew,");
+        System.out.println("zwiekszają populacje i uzupełniają zasoby atakując pobliskie miasta,");
+        System.out.println("mogą oczyszczać brudną krew zamieniając ją w drogocenne fiolki czystej krwi");
+        System.out.println();
+    }
+
 
     private void wyjscie() {
         System.out.println("Czy chcesz zapisać stan gry?");
@@ -205,7 +348,7 @@ public class Gra {
             System.out.println();
 
             try {
-                StanGry stan = new StanGry(miasto,dzien,rasa);
+                StanGry stan = new StanGry(miasto,dzien,rasa.getBitmask());
                 stan.zapiszDoPliku(nazwaZapisu);
                 koniecGry = true;
                 System.out.println("Dziękujemy za grę! Stan gry został zapisany.");
@@ -225,7 +368,7 @@ public class Gra {
 
     private void wybierzPoziomTrudnosci() {
         System.out.println("Wybierz poziom trudności:");
-        System.out.println("1. Łatwy - więcej zasobów startowych, mniej wymagające cele");
+        System.out.println("1. Łatwy - więcej zasobów startowych, mniej wymagające cele, mała liczba zasobów każdego dnia");
         System.out.println("2. Średni - zbalansowana rozgrywka");
         System.out.println("3. Trudny - mniej zasobów, częstsze katastrofy, wyższe koszty");
 
@@ -235,23 +378,17 @@ public class Gra {
 
     private void wybierzRase() {
         System.out.println("Wybierz rasę:");
-        System.out.println("1. Ludzie - # ");
-        System.out.println("2. Elfy - #");
-        System.out.println("3. Orki - #");
-        System.out.println("4. Nieumarli - #");
 
-        rasa = pobierzWybor(1, 4);
-        System.out.println();
-    }
-
-    private String nazwaRasy(int rasa) {
-        switch (rasa) {
-            case 1: return "Ludzie";
-            case 2: return "Elfy";
-            case 3: return "Orki";
-            case 4: return "Nieumarli";
-            default: return "Nieznana";
+        Rasa[] wszystkieRasy = Rasa.values();
+        for (int i = 0; i < wszystkieRasy.length; i++) {
+            System.out.printf("%d. %s%n", i + 1, wszystkieRasy[i].getNazwa());
         }
+
+        int wybor = pobierzWybor(1, wszystkieRasy.length);
+        rasa = wszystkieRasy[wybor - 1];
+
+        System.out.println("Wybrano rasę: " + rasa.getNazwa());
+        System.out.println();
     }
 
     private void inicjalizujMiasto() {
@@ -259,63 +396,94 @@ public class Gra {
         String nazwa = scanner.nextLine();
 
         // Wartości startowe zależne od poziomu trudności
-        int startowaPieniadze, startowaMaterialy, startowaPasek;
+        int startowaPieniadze, startowaMaterialy,startoweMaterialySpec, startowaPasek,startowaPopulacja;
         double mnoznikZdarzen;
 
         switch (poziomTrudnosci) {
             case 1: // Łatwy
-                startowaPieniadze = 1000;
-                startowaMaterialy = 500;
-                startowaPasek = 50;
+                startowaPieniadze = (int)(rasa.getPieniadzeStart()*1.5);
+                startowaMaterialy = (int)(rasa.getMaterialyStart()*1.5);
+                startoweMaterialySpec = (int)(rasa.getMaterialySpecStart()*1.5);
+                startowaPopulacja = (int)(rasa.getPopulacjaStart()*1.5);
+                startowaPasek = 75;
                 mnoznikZdarzen = 0.5;
                 break;
             case 2: // Średni
-                startowaPieniadze = 500;
-                startowaMaterialy = 250;
-                startowaPasek = 25;
+                startowaPieniadze = rasa.getPieniadzeStart();
+                startowaMaterialy = rasa.getMaterialyStart();
+                startoweMaterialySpec = rasa.getMaterialySpecStart();
+                startowaPopulacja = rasa.getPopulacjaStart();
+                startowaPasek = 50;
                 mnoznikZdarzen = 1.0;
                 break;
             case 3: // Trudny
-                startowaPieniadze = 300;
-                startowaMaterialy = 150;
-                startowaPasek = 15;
+                startowaPieniadze = (int)(rasa.getPieniadzeStart()*0.75);
+                startowaMaterialy = (int)(rasa.getMaterialyStart()*0.75);
+                startoweMaterialySpec = (int)(rasa.getMaterialySpecStart()*0.75);
+                startowaPopulacja = (int)(rasa.getPopulacjaStart()*0.75);
+                startowaPasek = 25;
                 mnoznikZdarzen = 1.5;
                 break;
             default:
-                startowaPieniadze = 500;
-                startowaMaterialy = 250;
-                startowaPasek = 25;
+                startowaPieniadze = rasa.getPieniadzeStart();
+                startowaMaterialy = rasa.getMaterialyStart();
+                startoweMaterialySpec = rasa.getMaterialySpecStart();
+                startowaPopulacja = rasa.getPopulacjaStart();
+                startowaPasek = 50;
                 mnoznikZdarzen = 1.0;
         }
 
-        miasto = new Miasto(nazwa, startowaPieniadze, startowaMaterialy, startowaPasek, mnoznikZdarzen);
+        miasto = new Miasto(nazwa, rasa, startowaPieniadze, startowaMaterialy, startoweMaterialySpec, startowaPasek,startowaPopulacja, mnoznikZdarzen);
         System.out.println("Miasto " + nazwa + " zostało założone!");
         System.out.println();
     }
 
     private void wyswietlStatystyki() {
         System.out.println("========================================");
-        System.out.println("Dzień: " + dzien + " | Miasto: " + miasto.getNazwa() + " | Rasa: " + nazwaRasy(rasa));
+        System.out.println((rasa.getBitmask() != 32 ? "Dzień: " : "Noc: ") + dzien + " | Miasto: " + miasto.getNazwa() + " | Rasa: " + rasa.getNazwa());
         System.out.println("========================================");
-        System.out.println("Populacja: " + miasto.getPopulacja() + " osób");
+        System.out.println("Populacja: " + miasto.getPopulacja());
         System.out.println("Zadowolenie: " + miasto.getZadowolenie() + "%");
-        System.out.println("Pieniądze: " + miasto.getPieniadze() + " złota");
-        System.out.println("Materiały budowlane: " + miasto.getMaterialy() + " kamienia");
-        System.out.println("Żywność: " + miasto.getZywnosc() + " jednostek");
+        if(!rasa.getPieniadze().isEmpty())System.out.println("Pieniądze: " + miasto.getPieniadze() + " " +rasa.getPieniadze());
+        if(!rasa.getMaterialy().isEmpty())System.out.println("Materiały: " + miasto.getMaterialy() + " " + rasa.getMaterialy());
+        if(!rasa.getMaterialySpec().isEmpty())System.out.println("Materiały dodatkowe: " + miasto.getMaterialySpec() + " " + rasa.getMaterialySpec());
+        if(!rasa.getZywnosc().isEmpty())System.out.println("Żywność: " + miasto.getZywnosc() + " " + rasa.getZywnosc());
         System.out.println("========================================");
         System.out.println("Liczba budynków: " + miasto.getLiczbaBudynkow());
         System.out.println("========================================");
         System.out.println();
     }
 
-    private void pokazMenu() {
+    private int pokazMenu() {
+        int n;
         System.out.println("Co chcesz zrobić?");
         System.out.println("1. Buduj nowy budynek");
         System.out.println("2. Ulepsz istniejący budynek");
         System.out.println("3. Istniejące budynki");
-        System.out.println("4. Następny dzień");
-        System.out.println("5. Pomoc - lista budynków i ich zastosowania");
-        System.out.println("6. Wyjście");
+        if(rasa.getBitmask()==16){
+            n=7;
+            System.out.println("4. Wypuść hordę");
+            System.out.println("5. Następny dzień");
+            System.out.println("6. Pomoc");
+            System.out.println("7. Wyjście");
+        }
+        else if(rasa.getBitmask()==32){
+            n = 8;
+            System.out.println("4. Rozpocznij Łowy");
+            System.out.println("5. Oczyść Krew");
+            System.out.println("6. Następny dzień");
+            System.out.println("7. Pomoc");
+            System.out.println("8. Wyjście");
+        } else{
+            n=6;
+            System.out.println("4. Następny dzień");
+            System.out.println("5. Pomoc");
+            System.out.println("6. Wyjście");
+        }
+
+        int wybor = pobierzWybor(1, n);
+
+        return wybor;
     }
 
     public int getPoziomRatusza() {
@@ -325,40 +493,67 @@ public class Gra {
 
 
     private void budujBudynek() {
-        if(miasto.getLiczbaBudynkow() -1 >= getPoziomRatusza()*2) {
-            System.out.println("Nie możesz wybudować wiecej budynków, zwiększ poziom ratusza!");
+        if(miasto.getLiczbaBudynkow() - 1 >= getPoziomRatusza() * 2) {
+            System.out.println("Nie możesz wybudować więcej budynków, zwiększ poziom ratusza!");
             System.out.println();
-        }else{
-            System.out.println("Jakie budynki możesz wybudować:");
-            System.out.println("1. Dom (100 złota, 50 kamienia) - zwiększa populację o 10 osób");
-            System.out.println("2. Pole uprawne (150 złota, 30 kamienia) - produkuje 15 jedzenia dziennie");
-            System.out.println("3. Kopalnia kamienia(200 złota, 100 kamienia) - produkuje 20 kamienia dziennie");
-            System.out.println("4. Kopalnia złota (250 złota, 120 kamienia) - generuje 50 złota dziennie");
-            System.out.println("5. Światynia (150 złota, 80 kamienia) - zwiększa zadowolenie o 10%");
-            System.out.println("6. Powrót do menu głównego");
-
-            int wybor = pobierzWybor(1, 6);
-            if (wybor == 6) return;
-
-            TypBudynku typ;
-            switch (wybor) {
-                case 1: typ = TypBudynku.DOM; break;
-                case 2: typ = TypBudynku.POLE; break;
-                case 3: typ = TypBudynku.KOPALNIAK; break;
-                case 4: typ = TypBudynku.KOPALNIAZ; break;
-                case 5: typ = TypBudynku.SWIATYNIA; break;
-                default: return;
-            }
-
-            if (miasto.mozeBudowac(typ)) {
-                miasto.budujBudynek(typ);
-                System.out.println("Budynek " + typ.getNazwa() + " został wybudowany!");
-            } else {
-                System.out.println("Nie masz wystarczających zasobów, aby wybudować ten budynek.");
-            }
-            System.out.println();
+            return;
         }
+
+        int bitRasy = rasa.getBitmask();
+
+        List<TypBudynku> dostepne = new ArrayList<>();
+        int index = 1;
+
+        System.out.println("Jakie budynki możesz wybudować:");
+
+        for(TypBudynku b : TypBudynku.values()) {
+            if (b.jestRatuszem()) continue;
+            if ((b.getBitmaskRasy() & bitRasy) != 0) {
+                dostepne.add(b);
+
+                String info = index + ". " + b.getNazwa() + " (" + b.getTyp() + ")";
+
+                List<String> statystyki = new ArrayList<>();
+                if (b.getKosztPieniadze() != 0) statystyki.add(b.getKosztPieniadze() + " " + rasa.getPieniadze());
+                if (b.getKosztMaterialy() != 0) statystyki.add(b.getKosztMaterialy() + " " + rasa.getMaterialy());
+                if (b.getKosztMaterialySpec() != 0) statystyki.add(b.getKosztMaterialySpec() + " " + rasa.getMaterialySpec());
+
+                if (!statystyki.isEmpty()) {
+                    info += " - Koszt wybudowania: " + String.join(" / ", statystyki);
+                }
+
+                statystyki = new ArrayList<>();
+                if (b.getBonusPieniadze() != 0) statystyki.add((b.getBonusPieniadze() >= 0 ? "+" : "") +b.getBonusPieniadze() + " " + rasa.getPieniadze());
+                if (b.getBonusMaterialy() != 0) statystyki.add((b.getBonusMaterialy() >= 0 ? "+" : "") +b.getBonusMaterialy() + " " + rasa.getMaterialy());
+                if (b.getBonusMaterialySpec() != 0) statystyki.add((b.getBonusMaterialySpec() >= 0 ? "+" : "") +b.getBonusMaterialySpec() + " " + rasa.getMaterialySpec());
+                if (b.getBonusZywnosc() != 0) statystyki.add((b.getBonusZywnosc() >= 0 ? "+" : "") +b.getBonusZywnosc() + " " + rasa.getZywnosc());
+                if (b.getBonusZadowolenie() != 0) statystyki.add("+"+b.getBonusZadowolenie() + "% Zadowolenia");
+                if (b.getBonusPopulacja() != 0) statystyki.add("+"+b.getBonusPopulacja() + " Populacji");
+
+                if (!statystyki.isEmpty()) {
+                    info += "  -  Statystyki: " + String.join(" / ", statystyki);
+                }
+
+                System.out.println(info);
+                index++;
+            }
+        }
+        System.out.println(index + ". Powrót do menu głównego");
+
+        int wybor = pobierzWybor(1, dostepne.size() + 1);
+        if (wybor == dostepne.size() + 1) return;
+
+        TypBudynku typ = dostepne.get(wybor - 1);
+
+        if (miasto.mozeBudowac(typ)) {
+            miasto.budujBudynek(typ);
+            System.out.println("Budynek " + typ.getNazwa() + " został wybudowany!");
+        } else {
+            System.out.println("Nie masz wystarczających zasobów, aby wybudować ten budynek.");
+        }
+        System.out.println();
     }
+
 
     private void istniejaceBudynki() {
         List<Budynek> budynki = miasto.getBudynki();
@@ -376,8 +571,38 @@ public class Gra {
         System.out.println("Które budynki chcesz ulepszyć:");
         for (int i = 0; i < budynki.size(); i++) {
             Budynek b = budynki.get(i);
-            System.out.println((i+1) + ". " + b.getTyp().getNazwa() + " (Poziom " + b.getPoziom() + ") - Koszt ulepszenia: " +
-                    b.getKosztUlepszeniaPieniadze() + " złota, " + b.getKosztUlepszeniaMaterialy() + " kamienia");
+            if(b.getTyp().jestSpecjalny()) continue;
+            if(b.getTyp().jestRatuszem()){
+                System.out.println((i+1) + ". " + b.getTyp().getNazwa() + " (POZIOM " + b.getPoziom() + ") - Koszt ulepszenia: " +
+                        b.getKosztUlepszeniaPieniadze() + " " + rasa.getPieniadze() + " / " + b.getKosztUlepszeniaMaterialy()+ " " + rasa.getMaterialy()
+                        + " / " + b.getKosztUlepszeniaMaterialySpec()+ " " + rasa.getMaterialySpec()+ " ---> "+ b.getTyp().getNazwa() +" (POZIOM "+
+                        (b.getPoziom()+1)+") - Maksymalna liczba budynków: " + (getPoziomRatusza()+1)*2 + " / Maksymalny poziom budynków: " + (getPoziomRatusza()+1));
+            }else{
+                String info = (i+1) + ". " + b.getTyp().getNazwa() + " (" +b.getTyp().getTyp() +", Poziom " + b.getPoziom() + ")";
+
+                List<String> statystyki = new ArrayList<>();
+                if (b.getKosztUlepszeniaPieniadze() != 0) statystyki.add(b.getKosztUlepszeniaPieniadze() + " " + rasa.getPieniadze());
+                if (b.getKosztUlepszeniaMaterialy() != 0) statystyki.add(b.getKosztUlepszeniaMaterialy() + " " + rasa.getMaterialy());
+                if (b.getKosztUlepszeniaMaterialySpec() != 0) statystyki.add(b.getKosztUlepszeniaMaterialySpec() + " " + rasa.getMaterialySpec());
+
+                if (!statystyki.isEmpty()) {
+                    info += " - Koszt ulepszenia: " + String.join(" / ", statystyki) + " ---> " + b.getTyp().getNazwa() + " (POZIOM "+(b.getPoziom()+1)+")" ;
+                }
+
+                statystyki = new ArrayList<>();
+                if (b.getTyp().getBonusPieniadze() != 0) statystyki.add((b.getBonusPieniadze() >= 0 ? "+" : "") +(int)(b.getBonusPieniadze()* (1.0 + b.getPoziom() * 0.5))+ " " + rasa.getPieniadze());
+                if (b.getTyp().getBonusMaterialy() != 0) statystyki.add((b.getBonusMaterialy() >= 0 ? "+" : "") +(int)(b.getBonusMaterialy()* (1.0 + b.getPoziom() * 0.5))+ " " + rasa.getMaterialy());
+                if (b.getTyp().getBonusMaterialySpec() != 0) statystyki.add((b.getBonusMaterialySpec() >= 0 ? "+" : "") +(int)(b.getBonusMaterialySpec()* (1.0 + b.getPoziom() * 0.5))+ " " + rasa.getMaterialySpec());
+                if (b.getTyp().getBonusZywnosc() != 0) statystyki.add((b.getBonusZywnosc() >= 0 ? "+" : "") +(int)(b.getBonusZywnosc()* (1.0 + b.getPoziom() * 0.5))+ " " + rasa.getZywnosc());
+                if (b.getTyp().getBonusZadowolenie() != 0) statystyki.add("+"+(int)((b.getBonusZadowolenie()* (1.0 + b.getPoziom() * 0.5)) - b.getBonusZadowolenie()) + "% Zadowolenia");
+                if (b.getTyp().getBonusPopulacja() != 0) statystyki.add("+"+(int)((b.getBonusPopulacja()* (1.0 + b.getPoziom() * 0.5)) - b.getBonusPopulacja()) + " Populacji");
+
+                if (!statystyki.isEmpty()) {
+                    info += " - Nowe statystyki: " + String.join(" / ", statystyki);
+                }
+
+                System.out.println(info);
+            }
         }
         System.out.println((budynki.size()+1) + ". Powrót do menu głównego");
 
@@ -386,7 +611,7 @@ public class Gra {
         System.out.println("");
 
         Budynek wybranyBudynek = budynki.get(wybor-1);
-        if (wybranyBudynek.getPoziom() >= getPoziomRatusza() && wybranyBudynek.getTyp() != TypBudynku.RATUSZ) {
+        if (wybranyBudynek.getPoziom() >= getPoziomRatusza() && !wybranyBudynek.getTyp().jestRatuszem()) {
             System.out.println("Budowla może mieć maksymalnie poziom ratusza, zwiększ poziom ratusza!");
         }else if (miasto.mozeUlepszyc(wybranyBudynek)) {
             miasto.ulepszBudynek(wybranyBudynek);
@@ -398,19 +623,22 @@ public class Gra {
     }
 
     private void zbierzZasoby() {
-        int zebraneZloto = miasto.zbierzPieniadze();
+        int zebranePieniadze = miasto.zbierzPieniadze();
         int zebraneMaterialy = miasto.zbierzMaterialy();
+        int zebraneMaterialySpec = miasto.zbierzMaterialySpec();;
         int zebranaZywnosc = miasto.zbierzZywnosc();
 
         System.out.println("Zebrano następujące zasoby:");
-        System.out.println("- " + zebraneZloto + " złota");
-        System.out.println("- " + zebraneMaterialy + " kamienia");
-        System.out.println("- " + zebranaZywnosc + " jedzenia");
+        if(zebranePieniadze !=0) System.out.println("- " + (zebranePieniadze >= 0 ? "+" : "")+ zebranePieniadze + " " + rasa.getPieniadze());
+        if(zebraneMaterialy != 0) System.out.println("- " + (zebraneMaterialy >= 0 ? "+" : "")+ zebraneMaterialy + " " + rasa.getMaterialy());
+        if(zebraneMaterialySpec !=0) System.out.println("- " + (zebraneMaterialySpec >= 0 ? "+" : "")+ zebraneMaterialySpec + " " + rasa.getMaterialySpec());
+        if(zebranaZywnosc !=0) System.out.println("- " + (zebranaZywnosc >= 0 ? "+" : "")+ zebranaZywnosc + " " + rasa.getZywnosc());
         System.out.println();
     }
 
     private void nastepnyDzien() {
         dzien++;
+        specjalny = false;
 
         // Sprawdzanie warunków przetrwania
         if (miasto.getZywnosc() <= 0) {
@@ -431,12 +659,94 @@ public class Gra {
         }
 
         // Zużycie żywności
-        int zuzycie = miasto.getPopulacja() / 10;
-        miasto.zmniejszZywnosc(zuzycie);
-        System.out.println("Twoi mieszkańcy zużyli " + zuzycie + " jedzenia.");
+        if(rasa.getBitmask() != 16) {
+            int zuzycie = miasto.getPopulacja() / 10;
+            miasto.zmniejszZywnosc(zuzycie);
+            System.out.println("Twoi mieszkańcy zużyli " + zuzycie + " " + rasa.getZywnosc());
+        }
+
+        // Spadające zadowolenie
+        miasto.zmniejszZadowolenie(poziomTrudnosci);
+
+        if(poziomTrudnosci==1){
+            miasto.aktualizujZasoby();
+        }
+
+
 
         System.out.println("Nastał nowy dzień!");
         System.out.println();
+    }
+
+    private void wypuscHorde(){
+        if(miasto.maSpecjalny()==1) {
+            if (specjalny) {
+                System.out.println("Horda dziś już plądrowała!");
+                System.out.println();
+            } else {
+                System.out.println("Wypuszczono hordę nieumarłych!");
+                System.out.println();
+                int mnoznik = random.nextInt(3) * miasto.getPopulacja();
+                System.out.println("Horda splądrowałą pobliskie tereny, zadowolenie zwiekszyło się o " + mnoznik + " %.");
+                System.out.println();
+                miasto.zwiekszZadowolenie(mnoznik);
+                specjalny = true;
+            }
+        }else{
+            System.out.println("Aby wysłać hordę na plądrowanie musisz ją pierwsze zbudować!");
+            System.out.println();
+        }
+    }
+
+    private void lowyKrwi(){
+        if(miasto.maSpecjalny()==1 || miasto.maSpecjalny()==3) {
+            if (specjalny) {
+                System.out.println("Łowy już dziś się obdyły!");
+                System.out.println();
+            } else {
+                System.out.println("Wojownicy wyruszyli na łowy!");
+                System.out.println();
+                int pieniadze = random.nextInt(2) * miasto.getPopulacja();
+                int jedzenie = random.nextInt(5) * miasto.getPopulacja();
+                int populacja = random.nextInt(10);
+                System.out.println("Łowcy wrócili z pobliskiego miasta, zdobyli:");
+                System.out.println();
+                if(pieniadze!=0) System.out.println("- " + (pieniadze > 0 ? "+" : "")+ pieniadze + " " + rasa.getPieniadze());
+                if(jedzenie!=0)  System.out.println("- " + (jedzenie > 0 ? "+" : "")+ jedzenie + " " + rasa.getZywnosc());
+                if(populacja!=0) System.out.println("- " + (populacja > 0 ? "+" : "")+ populacja + " nowych wampirów");
+                miasto.zwiekszPieniadze(pieniadze);
+                miasto.zwiekszZywnosc(jedzenie);
+                miasto.zwiekszPopulacje(populacja);
+                specjalny = true;
+            }
+        }else{
+            System.out.println("Aby wysłać wojowników na łowy musisz pierwsze zbudować koszary!");
+            System.out.println();
+        }
+    }
+
+    private void oczyscKrew(){
+        if(miasto.maSpecjalny()==2 || miasto.maSpecjalny()==3) {
+            if(miasto.getZywnosc()>=10){
+                miasto.zmniejszZywnosc(10);
+                int szansa = random.nextInt(10);
+                if(szansa>=3){
+                    System.out.println("Oczyszczono krew!");
+                    System.out.println("+5 " + rasa.getPieniadze());
+                    System.out.println();
+                    miasto.zmniejszPieniadze(5);
+                }else{
+                    System.out.println("Oczyszczanie się nie powiodło!");
+                    System.out.println();
+                }
+            }else{
+                System.out.println("Niewystarczająca ilość zanieczyszczonej krwi!");
+                System.out.println();
+            }
+        }else{
+            System.out.println("Aby móc oczyszczać krew musisz zbudować Oczyszczalnie Krwi!");
+            System.out.println();
+        }
     }
 
     private void generujLosoweDarzenie() {
@@ -449,17 +759,20 @@ public class Gra {
                 System.out.println("Wybuchł pożar w mieście! Stracono zasoby i uszkodzono budynki.");
                 miasto.zmniejszPieniadze(random.nextInt(100) + 50);
                 miasto.zmniejszMaterialy(random.nextInt(50) + 25);
+                miasto.zmniejszMaterialySpec(random.nextInt(40) + 20);
                 miasto.zmniejszZadowolenie(random.nextInt(10) + 5);
                 break;
             case 1:
                 System.out.println("Nastąpiła powódź! Uszkodzono część budynków i zapasów.");
                 miasto.zmniejszMaterialy(random.nextInt(80) + 40);
+                miasto.zmniejszMaterialySpec(random.nextInt(70) + 35);
                 miasto.zmniejszZywnosc(random.nextInt(30) + 15);
                 miasto.zmniejszZadowolenie(random.nextInt(8) + 4);
                 break;
             case 2:
                 System.out.println("Odkryto nowe złoża surowców! Zdobyto dodatkowe materiały.");
                 miasto.zwiekszMaterialy(random.nextInt(100) + 50);
+                miasto.zwiekszMaterialySpec(random.nextInt(120) + 55);
                 miasto.zwiekszZadowolenie(random.nextInt(5) + 1);
                 break;
             case 3:
