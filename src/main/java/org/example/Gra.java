@@ -53,8 +53,8 @@ public class Gra {
     }
 
     private void nowaGra() {
-        wybierzPoziomTrudnosci();
         wybierzRase();
+        wybierzPoziomTrudnosci();
         inicjalizujMiasto();
         start();
     }
@@ -396,7 +396,7 @@ public class Gra {
         String nazwa = scanner.nextLine();
 
         // Wartości startowe zależne od poziomu trudności
-        int startowaPieniadze, startowaMaterialy,startoweMaterialySpec, startowaPasek,startowaPopulacja;
+        int startowaPieniadze, startowaMaterialy,startoweMaterialySpec, startowaPasek,startowaPopulacja, startowaZywnosc;
         double mnoznikZdarzen;
 
         switch (poziomTrudnosci) {
@@ -405,6 +405,7 @@ public class Gra {
                 startowaMaterialy = (int)(rasa.getMaterialyStart()*1.5);
                 startoweMaterialySpec = (int)(rasa.getMaterialySpecStart()*1.5);
                 startowaPopulacja = (int)(rasa.getPopulacjaStart()*1.5);
+                startowaZywnosc = (int)(rasa.getZywnoscStart()*1.5);
                 startowaPasek = 75;
                 mnoznikZdarzen = 0.5;
                 break;
@@ -413,6 +414,7 @@ public class Gra {
                 startowaMaterialy = rasa.getMaterialyStart();
                 startoweMaterialySpec = rasa.getMaterialySpecStart();
                 startowaPopulacja = rasa.getPopulacjaStart();
+                startowaZywnosc = rasa.getZywnoscStart();
                 startowaPasek = 50;
                 mnoznikZdarzen = 1.0;
                 break;
@@ -421,6 +423,7 @@ public class Gra {
                 startowaMaterialy = (int)(rasa.getMaterialyStart()*0.75);
                 startoweMaterialySpec = (int)(rasa.getMaterialySpecStart()*0.75);
                 startowaPopulacja = (int)(rasa.getPopulacjaStart()*0.75);
+                startowaZywnosc = (int)(rasa.getZywnoscStart()*0.75);
                 startowaPasek = 25;
                 mnoznikZdarzen = 1.5;
                 break;
@@ -429,11 +432,12 @@ public class Gra {
                 startowaMaterialy = rasa.getMaterialyStart();
                 startoweMaterialySpec = rasa.getMaterialySpecStart();
                 startowaPopulacja = rasa.getPopulacjaStart();
+                startowaZywnosc = rasa.getZywnoscStart();
                 startowaPasek = 50;
                 mnoznikZdarzen = 1.0;
         }
 
-        miasto = new Miasto(nazwa, rasa, startowaPieniadze, startowaMaterialy, startoweMaterialySpec, startowaPasek,startowaPopulacja, mnoznikZdarzen);
+        miasto = new Miasto(nazwa, rasa, startowaPieniadze, startowaMaterialy, startoweMaterialySpec, startowaPasek,startowaPopulacja,startowaZywnosc, mnoznikZdarzen);
         System.out.println("Miasto " + nazwa + " zostało założone!");
         System.out.println();
     }
@@ -660,9 +664,9 @@ public class Gra {
 
         // Zużycie żywności
         if(rasa.getBitmask() != 16) {
-            int zuzycie = miasto.getPopulacja() / 10;
-            miasto.zmniejszZywnosc(zuzycie);
-            System.out.println("Twoi mieszkańcy zużyli " + zuzycie + " " + rasa.getZywnosc());
+            int zuzycie = miasto.getPopulacja() / 3;
+            miasto.zmniejszZywnosc((int)(zuzycie*rasa.getMnoznikZywnosci()*poziomTrudnosci));
+            System.out.println("Twoi mieszkańcy zużyli " + (int)(zuzycie*rasa.getMnoznikZywnosci()*poziomTrudnosci) + " " + rasa.getZywnosc());
         }
 
         // Spadające zadowolenie

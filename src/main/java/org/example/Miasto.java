@@ -13,14 +13,14 @@ public class Miasto {
     private double mnoznikZdarzen;
     private List<Budynek> budynki;
 
-    public Miasto(String nazwa, Rasa rasa, int pieniadze, int materialy,int materialySpec, int zywnosc,int populacja, double mnoznikZdarzen) {
+    public Miasto(String nazwa, Rasa rasa, int pieniadze, int materialy,int materialySpec, int zadowolenie,int populacja,int zywnosc, double mnoznikZdarzen) {
         this.nazwa = nazwa;
         this.pieniadze = pieniadze;
         this.materialy = materialy;
         this.materialySpec = materialySpec;
         this.zywnosc = zywnosc;
         this.populacja = populacja;
-        this.zadowolenie = 50;
+        this.zadowolenie = zadowolenie;
         this.mnoznikZdarzen = mnoznikZdarzen;
         this.budynki = new ArrayList<>();
 
