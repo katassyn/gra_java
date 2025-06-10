@@ -28,7 +28,7 @@ public enum TypBudynku {
 
 
     //Orki
-    RATUSZ_ORKI("Ratusz", "RATUSZ",0, 270,270, 0, 0, 0,0, 0, 0,8),
+    RATUSZ_ORKI("Chata Wodza", "RATUSZ",0, 270,270, 0, 0, 0,0, 0, 0,8),
 
     CHATKA_ORKA("Chatka wojownika", "Populacja", 0, 170, 130, 11, 0, 0, 0, 3, 0, 8),
     KAMIENIOŁOM("Kamieniołom", "Materiały", 0, 0, 200, 0, 25, 0, 0, 2, 0, 8),
