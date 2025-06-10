@@ -6,7 +6,7 @@ public enum Rasa {
     KRASNOLUDY("Krasnoludy",4, "Diamentów", "Żelaza", "Złota", "Żywności",150,300,250,70,15,1.5),
     ORKI("Orki",8, "", "Kamienia", "Drewna", "Żywności",100,300,250,100,20,2),
     NIEUMARLI("Nieumarli",16, "", "Kości", "Dusz", "",100,70,50,100,3,1),
-    WAMPIRY("Wampiry",32, "Fiolki Czystej Krwi", "Stali", "Mrocznych Kryształów", "Zanieczyszczonej Krwi",70,250,120,30,5,0.5);
+    WAMPIRY("Wampiry",32, "Fiolki Czystej Krwi", "Stali", "Mrocznych Kryształów", "Zanieczyszczonej Krwi",120,300,180,30,5,0.5);
 
     private final String nazwa;
     private final int bitmask;

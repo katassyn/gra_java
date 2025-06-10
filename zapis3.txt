@@ -1,0 +1,15 @@
+gildimberg
+60
+110
+60
+3
+5
+43
+1.0
+5
+32
+2
+RATUSZ_WAMPIRY
+1
+MROCZNE_TARGOWISKO
+1

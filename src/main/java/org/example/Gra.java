@@ -658,7 +658,7 @@ public class Gra {
         }
 
         // Losowe wydarzenia
-        if (random.nextDouble() < (0.2 * miasto.getMnoznikZdarzen())) {
+        if (random.nextDouble() < (0.1 * miasto.getMnoznikZdarzen())) {
             generujLosoweDarzenie();
         }
 
@@ -758,19 +758,31 @@ public class Gra {
 
         System.out.println("** LOSOWE WYDARZENIE **");
 
+
         switch (typ) {
             case 0:
-                System.out.println("Wybuchł pożar w mieście! Stracono zasoby i uszkodzono budynki.");
-                miasto.zmniejszPieniadze(random.nextInt(100) + 50);
+                if(rasa.getBitmask()==1) System.out.println("Wybuchł pożar w mieście! Stracono zasoby i uszkodzono budynki.");
+                else if(rasa.getBitmask()==2) System.out.println("Wybuchł pożar w lesie! Stracono zasoby i uszkodzono budynki.");
+                else if(rasa.getBitmask()==4) System.out.println("Wybuchł pożar w kopalni! Stracono zasoby i uszkodzono budynki.");
+                else if(rasa.getBitmask()==8) System.out.println("Wybuchł pożar w wiosce! Stracono zasoby i uszkodzono budynki.");
+                else if(rasa.getBitmask()==16) System.out.println("Wybuchł pożar na cmentarzu! Stracono zasoby i uszkodzono budynki.");
+                else if(rasa.getBitmask()==32) System.out.println("Wybuchł pożar w jaskini! Stracono zasoby i uszkodzono budynki.");
+
+                if(rasa.getBitmask()!=8 && rasa.getBitmask()!=16)miasto.zmniejszPieniadze(random.nextInt(100) + 50);
                 miasto.zmniejszMaterialy(random.nextInt(50) + 25);
                 miasto.zmniejszMaterialySpec(random.nextInt(40) + 20);
                 miasto.zmniejszZadowolenie(random.nextInt(10) + 5);
                 break;
             case 1:
-                System.out.println("Nastąpiła powódź! Uszkodzono część budynków i zapasów.");
+                if(rasa.getBitmask()==1) System.out.println("Nastąpiła powódź! Uszkodzono część budynków i zapasów.");
+                else if(rasa.getBitmask()==2) System.out.println("Pobliska rzeka wylała! Uszkodzono część budynków i zapasów.");
+                else if(rasa.getBitmask()==4) System.out.println("Po wielkiej ulewie część wody dostałą sie do kopalni! Uszkodzono część budynków i zapasów.");
+                else if(rasa.getBitmask()==8) System.out.println("Wielka nawałnica uszkodziła wioskę! Uszkodzono część budynków i zapasów.");
+                else if(rasa.getBitmask()==16) System.out.println("Pobliska rzeka wylała! Uszkodzono część budynków i zapasów.");
+                else if(rasa.getBitmask()==32) System.out.println("Część jaskini się zawaliła! Uszkodzono część budynków i zapasów.");
                 miasto.zmniejszMaterialy(random.nextInt(80) + 40);
                 miasto.zmniejszMaterialySpec(random.nextInt(70) + 35);
-                miasto.zmniejszZywnosc(random.nextInt(30) + 15);
+                if(rasa.getBitmask()!=16)miasto.zmniejszZywnosc(random.nextInt(30) + 15);
                 miasto.zmniejszZadowolenie(random.nextInt(8) + 4);
                 break;
             case 2:
@@ -780,39 +792,79 @@ public class Gra {
                 miasto.zwiekszZadowolenie(random.nextInt(5) + 1);
                 break;
             case 3:
-                System.out.println("Festiwal miejski! Zwiększyło się zadowolenie mieszkańców, ale kosztowało to trochę pieniędzy.");
+                if(rasa.getBitmask()==1)System.out.println("Festiwal miejski! Zwiększyło się zadowolenie mieszkańców, ale kosztowało to trochę pieniędzy.");
+                else if(rasa.getBitmask()==2)System.out.println("Festiwal natury! Zwiększyło się zadowolenie mieszkańców, ale kosztowało to trochę pieniędzy.");
+                else if(rasa.getBitmask()==4)System.out.println("Odbył się huczny ślub! Zwiększyło się zadowolenie mieszkańców, ale kosztowało to trochę pieniędzy.");
+                else if(rasa.getBitmask()==8)System.out.println("Odbył się turniej siły! Zwiększyło się zadowolenie mieszkańców");
+                else if(rasa.getBitmask()==16)System.out.println("Trupy miały okazję zaatakować przejezdnych wędrowców! Zwiększyło się zadowolenie mieszkańców");
+                else if(rasa.getBitmask()==32)System.out.println("Obył się jubileusz założenia klanu! Zwiększyło się zadowolenie mieszkańców, ale kosztowało to trochę pieniędzy.");
                 miasto.zwiekszZadowolenie(random.nextInt(15) + 5);
-                miasto.zmniejszPieniadze(random.nextInt(100) + 25);
+                if(rasa.getBitmask()!=16 && rasa.getBitmask()!=8)miasto.zmniejszPieniadze(random.nextInt(100) + 25);
                 break;
             case 4:
-                System.out.println("Grupa nowych osadników przybyła do miasta! Populacja się zwiększyła.");
-                miasto.zwiekszPopulacje(random.nextInt(15) + 5);
+                if(rasa.getBitmask()==1)System.out.println("Do miasta przybyła fala ambitnych osadników z sąsiedniego królestwa.");
+                else if(rasa.getBitmask()==2)System.out.println("Nowi osadnicy zamieszkali wśród drzew, szukając harmonii z naturą.");
+                else if(rasa.getBitmask()==4)System.out.println("Nowi górnicy zeszli do podziemi – populacja wzrosła.");
+                else if(rasa.getBitmask()==8)System.out.println("Silni wojownicy dołączyli do twojego plemienia – populacja rośnie!");
+                else if(rasa.getBitmask()==16)System.out.println("Z pobliskiego cmentarzyska powstały nowe nieumarłe istoty.");
+                else if(rasa.getBitmask()==32)System.out.println("Z ciemnych zakamarków jaskiń wyszły nowe pokolenia mieszkańców.");
+                if(rasa.getBitmask()!= 16 && rasa.getBitmask()!= 32)miasto.zwiekszPopulacje(random.nextInt(10) + 5);
+                if(rasa.getBitmask()== 16 || rasa.getBitmask()== 32)miasto.zwiekszPopulacje(random.nextInt(5) + 2);
                 miasto.zwiekszZadowolenie(random.nextInt(5) + 1);
                 break;
             case 5:
-                System.out.println("Epidemia w mieście! Część mieszkańców zachorowała.");
-                miasto.zmniejszPopulacje(random.nextInt(10) + 2);
+                if(rasa.getBitmask()==1)System.out.println("Zaraza rozprzestrzeniła się po mieście, wielu mieszkańców zachorowało.");
+                if(rasa.getBitmask()==2)System.out.println("Zaraza rozprzestrzeniła się po mieście, wielu mieszkańców zachorowało.");
+                if(rasa.getBitmask()==4)System.out.println("W kopalni wybuchła tajemnicza choroba, osłabiając robotników.");
+                if(rasa.getBitmask()==8)System.out.println("Orki zapadły na gorączkę bitewną. Tylko najsilniejsi przetrwali.");
+                if(rasa.getBitmask()==16)System.out.println("Część twojej nieumarłej armii rozsypała się w pył w wyniku klątwy.");
+                if(rasa.getBitmask()==32)System.out.println("Brudna krew spowodowała liczne choroby.");
+                if(rasa.getBitmask()!= 32 && rasa.getBitmask()!= 16)miasto.zmniejszPopulacje(random.nextInt(10) + 5);
+                if(rasa.getBitmask()== 16 || rasa.getBitmask()== 32)miasto.zwiekszPopulacje(random.nextInt(5) + 2);
                 miasto.zmniejszZadowolenie(random.nextInt(10) + 5);
-                miasto.zmniejszPieniadze(random.nextInt(50) + 25);
+                if(rasa.getBitmask()!= 8 && rasa.getBitmask()!= 16)miasto.zmniejszPieniadze(random.nextInt(50) + 25);
                 break;
             case 6:
-                System.out.println("Udany zbiór! Twoje pola uprawne wyprodukwały więcej żywności niż zwykle.");
-                miasto.zwiekszZywnosc(random.nextInt(50) + 25);
+                if(rasa.getBitmask()==1)System.out.println("Obfite żniwa przyniosły mnóstwo pożywienia w miejskich spichlerzach.");
+                else if(rasa.getBitmask()==2)System.out.println("Natura była łaskawa – plony elfów obrodziły obficie.");
+                else if(rasa.getBitmask()==4)System.out.println("Tygiel górniczy zapełniony zapasami – zdobyto wiele jadła.");
+                else if(rasa.getBitmask()==8)System.out.println("Orki złupiły sąsiednie osady, zdobywając mnóstwo jedzenia.");
+                else if(rasa.getBitmask()==16)System.out.println("Ciała przypadkowych wędrowców stały się pożywką – nieumarli świętują.");
+                else if(rasa.getBitmask()==32)System.out.println("W głębi nocy udało się upolować przypadkowe istoty.");
+                if(rasa.getBitmask()!=16)miasto.zwiekszZywnosc(random.nextInt(50) + 25);
                 miasto.zwiekszZadowolenie(random.nextInt(3) + 1);
                 break;
             case 7:
-                System.out.println("Nieurodzaj! Twoje pola uprawne wyprodukwały mniej żywności niż zwykle.");
-                miasto.zmniejszZywnosc(random.nextInt(40) + 20);
+                if(rasa.getBitmask()==1)System.out.println("Susza spustoszyła plony – brakuje jedzenia.");
+                else if(rasa.getBitmask()==2)System.out.println("Susza spustoszyła plony – brakuje jedzenia.");
+                else if(rasa.getBitmask()==4)System.out.println("Zalanie chłodników zniszczyło zapasy jedzenia górników.");
+                else if(rasa.getBitmask()==8)System.out.println("Orki nie zdołały złupić niczego – brzuchy puste, nastroje złe.");
+                else if(rasa.getBitmask()==16)System.out.println("Nieumarli nie znaleźli nowych ofiar i złóż – zaczyna się rozkład.");
+                else if(rasa.getBitmask()==32)System.out.println("Zbiorniki z krwią się rozbiły – czas głodu.");
+                if(rasa.getBitmask()!=16)miasto.zmniejszZywnosc(random.nextInt(20) + 20);
+                if(rasa.getBitmask()==16)miasto.zmniejszMaterialy(random.nextInt(20) + 20);
                 miasto.zmniejszZadowolenie(random.nextInt(5) + 2);
                 break;
             case 8:
-                System.out.println("Otrzymałeś dotację od sąsiedniego miasta! Twoje fundusze wzrosły.");
-                miasto.zwiekszPieniadze(random.nextInt(200) + 100);
+                if(rasa.getBitmask()==1)System.out.println("Sąsiednie miasto przysłało darowiznę. Skarbiec się wzbogacił.");
+                else if(rasa.getBitmask()==2)System.out.println("Sąsiednie miasto przysłało darowiznę. Skarbiec się wzbogacił.");
+                else if(rasa.getBitmask()==4)System.out.println("Kopalnia otrzymała dotację od królestwa za wyjątkowe wyniki.");
+                else if(rasa.getBitmask()==8)System.out.println("Orki zrabowały wrogą karawanę. Wzrosły zapasy specjalne.");
+                else if(rasa.getBitmask()==16)System.out.println("Nieumarli przechwycili konwój i wyssali energię z jego dusz.");
+                else if(rasa.getBitmask()==32)System.out.println("Wampiry otrzymali ofiary od przestraszonych wędrowców.");
+                if(rasa.getBitmask()!=8 && rasa.getBitmask()!= 16)miasto.zwiekszPieniadze(random.nextInt(200) + 100);
+                if(rasa.getBitmask()==8 || rasa.getBitmask()== 16) miasto.zwiekszMaterialy(random.nextInt(80) + 50);
                 miasto.zwiekszZadowolenie(random.nextInt(5) + 1);
                 break;
             case 9:
-                System.out.println("Złodzieje okradli skarbiec miasta! Stracono część pieniędzy.");
-                miasto.zmniejszPieniadze(random.nextInt(150) + 50);
+                if(rasa.getBitmask()==1)System.out.println("Złodzieje splądrowali miasto i zabrali złoto!");
+                else if(rasa.getBitmask()==2)System.out.println("Złodzieje ukradli magiczne artefakty i złoto elfów!");
+                else if(rasa.getBitmask()==4)System.out.println("Skarbiec górników został splądrowany – duże straty.");
+                else if(rasa.getBitmask()==8)System.out.println("Wrogie plemię orków zniszczyło część zapasów.");
+                else if(rasa.getBitmask()==16)System.out.println("Zbezczeszczone relikwie zostały sprofanowane. Strata niematerialna.");
+                else if(rasa.getBitmask()==32)System.out.println("W jaskiniach doszło do sabotażu – część zapasów zniknęła.");
+                if(rasa.getBitmask()!=8 && rasa.getBitmask()!= 16) miasto.zmniejszPieniadze(random.nextInt(150) + 50);
+                if(rasa.getBitmask()==8 || rasa.getBitmask()== 16) miasto.zmniejszMaterialySpec(random.nextInt(50) + 50);
                 miasto.zmniejszZadowolenie(random.nextInt(10) + 2);
                 break;
         }
