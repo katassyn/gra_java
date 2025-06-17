@@ -184,12 +184,12 @@ public class Miasto {
         return suma;
     }
 
-    public void aktualizujZasoby() {
+    public void aktualizujZasoby(Rasa rasa) {
         // Automatyczne zbieranie niewielkiej ilości zasobów każdego dnia
-        pieniadze += populacja * 3;
-        materialy += populacja * 2;
-        materialySpec += populacja * 2;
-        zywnosc += populacja / 10;
+        pieniadze += (int)(rasa.getPieniadzeStart() * 0.05);
+        materialy += (int)(rasa.getMaterialyStart() * 0.05);
+        materialySpec += (int)(rasa.getMaterialySpecStart() * 0.05);
+        zywnosc += (int)(rasa.getZywnoscStart() * 0.05);
     }
 
     public void zwiekszPieniadze(int ilosc) {
