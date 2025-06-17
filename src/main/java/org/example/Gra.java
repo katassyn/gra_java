@@ -673,7 +673,7 @@ public class Gra {
         miasto.zmniejszZadowolenie(poziomTrudnosci);
 
         if(poziomTrudnosci==1){
-            miasto.aktualizujZasoby();
+            miasto.aktualizujZasoby(rasa);
         }
 
 
