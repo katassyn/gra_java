@@ -60,10 +60,32 @@ public class Gra {
     }
 
     private void wczytajGra() {
-        System.out.println("Wybierz slot zapisu:");
-        int wybor = pobierzWybor(1, 3);
-        System.out.println();
+        StanGry[] stany = new StanGry[3];
+        Rasa[] rasy = new Rasa[3];
+        Miasto[] miasta = new Miasto[3];
+        int[] dni = new int[3];
 
+        System.out.println("====== DOSTĘPNE ZAPISY GRY ======");
+
+        for (int i = 0; i < 3; i++) {
+            String nazwaPliku = "zapis" + (i + 1) + ".txt";
+            try {
+                stany[i] = StanGry.wczytajZPliku(nazwaPliku);
+                miasta[i] = stany[i].odtworzMiasto();
+                dni[i] = stany[i].getDzien();
+                rasy[i] = Rasa.fromBitmask(stany[i].getRasa());
+
+                System.out.println((i+1) + ". Slot [" + (i + 1) + "] Nazwa: " + miasta[i].getNazwa()
+                        + " / Rasa: " + rasy[i].getNazwa() + " / Dzień: " + dni[i]);
+            } catch (IOException e) {
+                System.out.println((i+1) + ". Slot [" + (i + 1) + "] Brak zapisu gry.");
+            }
+        }
+        System.out.println("4. Powrót do menu głównego");
+        System.out.println();
+        int wybor = pobierzWybor(1, 4);
+        System.out.println();
+        if(wybor ==4) {menuGlowne();}
         String nazwaPliku = "zapis" + wybor + ".txt";
 
         try {
@@ -77,6 +99,7 @@ public class Gra {
         } catch (IOException e) {
             System.out.println("Nie udało się wczytać zapisu: " + e.getMessage());
             System.out.println();
+            menuGlowne();
         }
     }
 
@@ -341,9 +364,31 @@ public class Gra {
         System.out.println();
 
         if(wybor == 1) {
+            System.out.println("====== ISTNIEJĄCE ZAPISY ======");
+
+            for (int i = 0; i < 3; i++) {
+                String nazwaPliku = "zapis" + (i + 1) + ".txt";
+                try {
+                    StanGry stan = StanGry.wczytajZPliku(nazwaPliku);
+                    Miasto m = stan.odtworzMiasto();
+                    Rasa r = Rasa.fromBitmask(stan.getRasa());
+                    int dzien = stan.getDzien();
+
+                    System.out.println((i+1) + ". Slot [" + (i + 1) + "] Nazwa: " + m.getNazwa()
+                            + " / Rasa: " + r.getNazwa() + " / Dzień: " + dzien);
+                } catch (IOException e) {
+                    System.out.println((i+1) + ". Slot [" + (i + 1) + "] Brak zapisu gry.");
+                }
+            }
+
+            System.out.println("4. Powrót do menu gry");
+            System.out.println();
             System.out.println("Wybierz slot zapisu:");
             System.out.println("||UWAGA|| -- Spowoduje to usunięcie poprzedniego zapisu w tym slocie! -- ||UWAGA||");
-            int nrZapisu = pobierzWybor(1, 3);
+            int nrZapisu = pobierzWybor(1, 4);
+
+            if(nrZapisu == 4) {start();}
+
             String nazwaZapisu = "zapis" + nrZapisu + ".txt";
             System.out.println();
 
@@ -355,6 +400,8 @@ public class Gra {
                 System.out.println();
             } catch (IOException e) {
                 System.out.println("Błąd podczas zapisu gry: " + e.getMessage());
+                System.out.println("Wracam do menu");
+                start();
             }
 
         }else {
